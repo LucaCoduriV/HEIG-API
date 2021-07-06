@@ -60,7 +60,7 @@ export default async (req: Request, res: Response) => {
                 if (row.children[i].querySelector(".teaching") != null) {
                     horaires.push({
                         nom: row.children[i].querySelector(".teaching").innerHTML,
-                        debut: count++,
+                        debut: count,
                         periodes: parseInt(row.children[i].getAttribute("rowspan")),
                         jour: getDayFromPos(row.children[i].getBoundingClientRect().left),
                         prof: row.children[i].querySelector(".teacherAcronym")?.innerHTML,
@@ -68,6 +68,7 @@ export default async (req: Request, res: Response) => {
                     });
                 }
             }
+            count++;
         });
         return horaires;
     });
