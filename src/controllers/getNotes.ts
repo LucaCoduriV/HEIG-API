@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { StatusCodes } from "http-status-codes";
 import puppeteer, { Browser, Page } from "puppeteer";
+import connectToGapps from "../utils/connectToGapps";
 
 export default async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -22,21 +23,8 @@ export default async (req: Request, res: Response) => {
     const username: string = req.query.username as string;
     const password: string = req.query.password as string;
 
-    //Va a la page des notes
-    await page.goto(url);
-    await page.waitForSelector("#user_idp");
-    //Si GAPSSESSION est vide c'est le formulaire de connexion qui devrait apparaître
-    // on selectionne HES-SO (OUI la valeur c'est vraiment l'url de "drop_down_value")
-    await page.select("#user_idp", drop_down_value);
-    await page.click("#wayf_submit_button");
-    //On attend que la navigation et que la page se load corréctement (sinon des erreurs peuvent survenir)
-    await page.waitForNavigation();
-    await page.waitForSelector("#username");
-    // On remplit username/password pour se connecter
+    await connectToGapps(page, username, password, url);
 
-    await page.type("#username", username);
-    await page.type("#password", password);
-    await page.click(".aai_login_button");
     await page.waitForSelector(".displayArray");
 
     // Se connecter avec nom d'utilisateur et mdp si cookie non valide
