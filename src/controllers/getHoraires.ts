@@ -28,13 +28,49 @@ export default async (req: Request, res: Response) => {
     await page.waitForSelector(".horaire");
 
     const resultats = await page.$$eval(".horaire tr", (rows) => {
+        enum JourSemaine {
+            LUNDI = 0,
+            MARDI,
+            MERCREDI,
+            JEUDI,
+            VENDREDI,
+        }
+
+        function getDayFromPos(position: number): JourSemaine {
+            switch (position) {
+                case 75:
+                    return JourSemaine.LUNDI;
+                case 223:
+                    return JourSemaine.MARDI;
+                case 371:
+                    return JourSemaine.MERCREDI;
+                case 519:
+                    return JourSemaine.JEUDI;
+                case 667:
+                    return JourSemaine.VENDREDI;
+                default:
+                    return JourSemaine.LUNDI;
+            }
+        }
+
+        let horaires: Array<HeureCours> = [];
+        let count = 0;
         rows.forEach((row, index) => {
             for (let i = 0; i < row.childElementCount; i++) {
-                console.log(row.children[i].querySelector(".teaching")?.innerHTML);
-                console.log(row.children[i].getAttribute("rowspan"));
+                if (row.children[i].querySelector(".teaching") != null) {
+                    horaires.push({
+                        nom: row.children[i].querySelector(".teaching").innerHTML,
+                        debut: count++,
+                        periodes: parseInt(row.children[i].getAttribute("rowspan")),
+                        jour: getDayFromPos(row.children[i].getBoundingClientRect().left),
+                        prof: row.children[i].querySelector(".teacherAcronym")?.innerHTML,
+                        salle: row.children[i].querySelector("span a")?.innerHTML,
+                    });
+                }
             }
         });
+        return horaires;
     });
 
-    res.send("coucou");
+    res.send(resultats);
 };
