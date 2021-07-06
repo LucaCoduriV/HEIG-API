@@ -17,7 +17,7 @@ export default async (req: Request, res: Response) => {
   });
   const page: Page = await browser.newPage();
 
-  const url: string = process.env.GAPS_URL;
+  const url: string = process.env.GAPS_GRADE_URL;
   const drop_down_value: string = "https://aai-logon.hes-so.ch/idp/shibboleth";
   const username: string = process.env.HEIG_USERNAME;
   const password: string = process.env.HEIG_PASSWORD;
@@ -37,11 +37,49 @@ export default async (req: Request, res: Response) => {
   await page.type("#username", username);
   await page.type("#password", password);
   await page.click(".aai_login_button");
+  await page.waitForSelector(".displayArray");
 
+  // Se connecter avec nom d'utilisateur et mdp si cookie non valide
   // sauvegarder le cookie dans une table MYSQL avec les info de l'user -> https://stackoverflow.com/questions/11252704/mysql-delete-records-older-than-x-minutes
   // et supprimer X temps (il faut détérminer combien de temps dure la session gaps)
   // utiliser le cookie pour les requêtes -> en verifiant si l'user à recemment exécuté une requête et que le cookie se trouve dans notre tableau
-
+  //   await page.evaluate(`(async () => {
+  //     var table = document.getElementsByClassName("displayArray");
+  //     console.log(table);
+  //   })()`);
+  //   const tr = await page.$eval(
+  //     "table.displayArray > tbody",
+  //     (el) => el.childNodes
+  //   );
+  const resultats = await page.$$eval(".displayArray tr", (rows) => {
+    let notes: any = {};
+    let branche: string = "";
+    let type: string;
+    rows.forEach((row) => {
+      switch (row.childElementCount) {
+        case 1:
+          branche = row.firstElementChild.textContent;
+          const splitted = branche.split(" ");
+          branche = splitted[0];
+          notes[branche] = {
+            cours: [],
+            laboratoire: [],
+            moyenne: splitted[splitted.length - 1],
+          };
+          break;
+        case 6:
+          const text: any = row.lastElementChild.textContent;
+          type = text.split(" ")[0];
+          type.toLocaleLowerCase();
+          break;
+        default:
+          const grade: any = row.lastElementChild.textContent;
+          notes[branche][type].push(grade);
+      }
+    });
+    return notes;
+  });
+  console.log(resultats);
   /*
       les vérification suivante doivent être fait dans le <table>[0]
   
@@ -52,9 +90,10 @@ export default async (req: Request, res: Response) => {
 
   // Exemple d'objet contenant les notes
   res.send({
-    prg: {
+    ARO: {
       cours: [2.5, 4.2, 3.5],
       labo: [3.5, 4.1, 3.8],
+      moyenne: 4.9,
     },
   });
 };
