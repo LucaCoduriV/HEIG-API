@@ -13,6 +13,6 @@ web-build/
 .env
 Server/dist
 Server/public/pictures
-
+dist
 # macOS
 .DS_Store
