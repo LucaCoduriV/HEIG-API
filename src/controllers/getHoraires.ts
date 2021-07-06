@@ -71,6 +71,6 @@ export default async (req: Request, res: Response) => {
         });
         return horaires;
     });
-
+    browser.close();
     res.send(resultats);
 };

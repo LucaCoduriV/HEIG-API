@@ -84,6 +84,6 @@ export default async (req: Request, res: Response) => {
       else <td> contient les notes
       */
 
-    // Exemple d'objet contenant les notes
+    browser.close();
     res.send(resultats);
 };
