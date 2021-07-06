@@ -52,28 +52,36 @@ export default async (req: Request, res: Response) => {
   //     (el) => el.childNodes
   //   );
   const resultats = await page.$$eval(".displayArray tr", (rows) => {
-    let notes: any = {};
-    let branche: string = "";
-    let type: string;
+    let notes: Bulletin = {};
+    let branche: string;
+    let type: "cours" | "laboratoire";
     rows.forEach((row) => {
       switch (row.childElementCount) {
         case 1:
           branche = row.firstElementChild.textContent;
           const splitted = branche.split(" ");
           branche = splitted[0];
+          console.log(branche);
           notes[branche] = {
             cours: [],
             laboratoire: [],
-            moyenne: splitted[splitted.length - 1],
+            moyenne: parseFloat(splitted[splitted.length - 1]),
           };
           break;
         case 6:
-          const text: any = row.lastElementChild.textContent;
-          type = text.split(" ")[0];
-          type.toLocaleLowerCase();
+          const text: any = row.firstElementChild.textContent;
+
+          console.log(text);
+
+          if (text.includes("Cours")) {
+            type = "cours";
+          } else {
+            type = "laboratoire";
+          }
           break;
         default:
           const grade: any = row.lastElementChild.textContent;
+          console.log(type);
           notes[branche][type].push(grade);
       }
     });
@@ -89,11 +97,5 @@ export default async (req: Request, res: Response) => {
       */
 
   // Exemple d'objet contenant les notes
-  res.send({
-    ARO: {
-      cours: [2.5, 4.2, 3.5],
-      labo: [3.5, 4.1, 3.8],
-      moyenne: 4.9,
-    },
-  });
+  res.send(resultats);
 };
