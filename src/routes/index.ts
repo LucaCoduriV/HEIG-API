@@ -1,9 +1,15 @@
 import express from "express";
+import puppeteer from "puppeteer";
+import getNotes from "../controllers/getNotes";
+import { body, validationResult } from "express-validator";
+
 const router = express.Router();
 
-// define the home page route
-router.get("/", function (req, res) {
-    res.send("HELLO WORLD !");
-});
+router.get(
+    "/notes",
+    body("username").isLength({ min: 3 }),
+    body("password").isLength({ min: 4 }),
+    getNotes
+);
 
 export default router;

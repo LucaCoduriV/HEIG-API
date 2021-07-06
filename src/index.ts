@@ -3,6 +3,7 @@ import express from "express";
 import router from "./routes";
 import morgan from "morgan";
 import cors from "cors";
+import { json } from "body-parser";
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const PORT = process.env.SERVER_PORT;
 const NODE_ENV = process.env.NODE_ENV;
 
 app.use(cors());
+app.use(json());
 app.use(morgan(NODE_ENV == "development" ? "dev" : "combined"));
 app.use(router);
 
