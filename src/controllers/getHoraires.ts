@@ -27,7 +27,7 @@ export default async (req: Request, res: Response) => {
 
     await page.waitForSelector(".horaire");
 
-    const resultats = await page.$$eval(".horaire tr", (rows) => {
+    const resultats = await page.$$eval(".horaire > tbody > tr", (rows) => {
         enum JourSemaine {
             LUNDI = 0,
             MARDI,
@@ -54,13 +54,13 @@ export default async (req: Request, res: Response) => {
         }
 
         let horaires: Array<HeureCours> = [];
-        let count = 0;
         rows.forEach((row, index) => {
+            console.log(row);
             for (let i = 0; i < row.childElementCount; i++) {
                 if (row.children[i].querySelector(".teaching") != null) {
                     horaires.push({
                         nom: row.children[i].querySelector(".teaching").innerHTML,
-                        debut: count,
+                        debut: index,
                         periodes: parseInt(row.children[i].getAttribute("rowspan")),
                         jour: getDayFromPos(row.children[i].getBoundingClientRect().left),
                         prof: row.children[i].querySelector(".teacherAcronym")?.innerHTML,
@@ -68,7 +68,6 @@ export default async (req: Request, res: Response) => {
                     });
                 }
             }
-            count++;
         });
         return horaires;
     });
