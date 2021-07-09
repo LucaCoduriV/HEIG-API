@@ -40,21 +40,22 @@ export default async (req: Request, res: Response) => {
     //     (el) => el.childNodes
     //   );
     const resultats = await page.$$eval(".displayArray tr", (rows) => {
-        let notes: Bulletin = {};
-        let branche: string;
+        let notes: Array<Branche> = [];
+        let nomBranche: string;
         let type: "cours" | "laboratoire";
         rows.forEach((row) => {
             switch (row.childElementCount) {
                 case 1:
-                    branche = row.firstElementChild.textContent;
-                    const splitted = branche.split(" ");
-                    branche = splitted[0];
-                    console.log(branche);
-                    notes[branche] = {
+                    nomBranche = row.firstElementChild.textContent;
+                    const splitted = nomBranche.split(" ");
+                    nomBranche = splitted[0];
+                    console.log(nomBranche);
+                    notes.push({
+                        nom: nomBranche,
                         cours: [],
                         laboratoire: [],
                         moyenne: parseFloat(splitted[splitted.length - 1]),
-                    };
+                    });
                     break;
                 case 6:
                     const text: any = row.firstElementChild.textContent;
@@ -70,7 +71,7 @@ export default async (req: Request, res: Response) => {
                 default:
                     const grade: any = row.lastElementChild.textContent;
                     console.log(type);
-                    notes[branche][type].push(grade);
+                    notes[notes.length - 1][type].push(grade);
             }
         });
         return notes;
