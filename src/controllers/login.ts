@@ -20,9 +20,9 @@ export default async (req: Request, res: Response) => {
         if (!(await connectToGapps(page, username, password)))
             throw Error("wrong username or passsword");
     } catch (e) {
-        // browser.close();
+        browser.close();
         return res.status(StatusCodes.UNAUTHORIZED).send({ error: e.message });
     }
-    //browser.close();
+    browser.close();
     return res.status(StatusCodes.OK).send();
 };
