@@ -23,8 +23,8 @@ export default async (req: Request, res: Response) => {
     const username: string = req.query.username as string;
     const password: string = req.query.password as string;
 
-    await connectToGapps(page, username, password, url);
-
+    await connectToGapps(page, username, password);
+    await page.goto(url, { waitUntil: "networkidle0" });
     await page.waitForSelector(".displayArray");
 
     // Se connecter avec nom d'utilisateur et mdp si cookie non valide
@@ -71,7 +71,8 @@ export default async (req: Request, res: Response) => {
                 default:
                     const grade: any = row.lastElementChild.textContent;
                     console.log(type);
-                    notes[notes.length - 1][type].push(grade);
+                    let cvtGrade = parseFloat(grade);
+                    notes[notes.length - 1][type].push(!isNaN(cvtGrade) ? cvtGrade : 0.0);
             }
         });
         return notes;

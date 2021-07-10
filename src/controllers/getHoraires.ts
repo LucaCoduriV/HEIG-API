@@ -23,7 +23,8 @@ export default async (req: Request, res: Response) => {
     const username: string = process.env.HEIG_USERNAME;
     const password: string = process.env.HEIG_PASSWORD;
 
-    await connectToGapps(page, username, password, url);
+    await connectToGapps(page, username, password);
+    await page.goto(url);
 
     await page.waitForSelector(".horaire");
 
