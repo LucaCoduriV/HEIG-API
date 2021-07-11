@@ -1,6 +1,6 @@
 interface Branche {
     nom: string;
-    cours: Array<number>;
-    laboratoire?: Array<number>;
+    cours: Array<Note>;
+    laboratoire?: Array<Note>;
     moyenne: number;
 }

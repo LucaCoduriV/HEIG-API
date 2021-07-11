@@ -69,10 +69,19 @@ export default async (req: Request, res: Response) => {
                     }
                     break;
                 default:
-                    const grade: any = row.lastElementChild.textContent;
+                    const grade: any = row.children[row.children.length - 1].textContent;
+                    const coef: any = row.children[row.children.length - 2].textContent;
+                    const moyenne: any = row.children[row.children.length - 3].textContent;
+                    const title: any = row.children[row.children.length - 4].textContent;
                     console.log(type);
                     let cvtGrade = parseFloat(grade);
-                    notes[notes.length - 1][type].push(!isNaN(cvtGrade) ? cvtGrade : 0.0);
+                    let cvtMoyenne = parseFloat(moyenne);
+                    notes[notes.length - 1][type].push({
+                        moyenneClasse: !isNaN(cvtMoyenne) ? cvtMoyenne : 0.0,
+                        titre: title,
+                        note: !isNaN(cvtGrade) ? cvtGrade : 0.0,
+                        coef: coef, // TODO transformer en float
+                    });
             }
         });
         return notes;
