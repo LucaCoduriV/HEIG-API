@@ -1,30 +1,37 @@
 import express from "express";
 import getNotes from "../controllers/getNotes";
-import { query, validationResult } from "express-validator";
+import { query, validationResult, body } from "express-validator";
 import getHoraires from "../controllers/getHoraires";
 import login from "../controllers/login";
+import getPublicKey from "../controllers/getPublicKey";
+import encryptData from "../controllers/encryptData";
+import decrypt from "../middlewares/decrypt";
 
 const router = express.Router();
 
-router.get(
+router.post(
     "/notes",
-    query("username").isLength({ min: 3 }),
-    query("password").isLength({ min: 4 }),
+    body("username").isLength({ min: 3 }),
+    body("password").isLength({ min: 4 }),
     getNotes
 );
 
-router.get(
+router.post(
     "/horaires",
-    query("username").isLength({ min: 3 }),
-    query("password").isLength({ min: 4 }),
+    body("username").isLength({ min: 3 }),
+    body("password").isLength({ min: 4 }),
     getHoraires
 );
 // il faut peut-être changer la méthode get pour post car dans l'historique les mot de passe seront affiché en claire.
-router.get(
+router.post(
     "/login",
-    query("username").isLength({ min: 3 }),
-    query("password").isLength({ min: 4 }),
+    body("username").isLength({ min: 3 }),
+    body("password").isLength({ min: 4 }),
+    decrypt,
     login
 );
+
+router.get("/publickey", getPublicKey);
+router.get("/encryptdata", encryptData); // pour tester seulement
 
 export default router;

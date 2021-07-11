@@ -20,8 +20,8 @@ export default async (req: Request, res: Response) => {
 
     const url: string = process.env.GAPS_GRADE_URL;
     const drop_down_value: string = "https://aai-logon.hes-so.ch/idp/shibboleth";
-    const username: string = req.query.username as string;
-    const password: string = req.query.password as string;
+    const username: string = req.body.username as string;
+    const password: string = req.body.password as string;
 
     await connectToGapps(page, username, password);
     await page.goto(url, { waitUntil: "networkidle0" });

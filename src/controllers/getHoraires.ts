@@ -20,8 +20,8 @@ export default async (req: Request, res: Response) => {
     });
     const page: Page = await browser.newPage();
 
-    const username: string = process.env.HEIG_USERNAME;
-    const password: string = process.env.HEIG_PASSWORD;
+    const username: string = req.body.username as string;
+    const password: string = req.body.password as string;
 
     await connectToGapps(page, username, password);
     await page.goto(url);

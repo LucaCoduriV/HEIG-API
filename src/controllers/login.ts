@@ -14,8 +14,8 @@ export default async (req: Request, res: Response) => {
     });
     const page: Page = await browser.newPage();
 
-    const username: string = req.query.username as string;
-    const password: string = req.query.password as string;
+    const username: string = req.body.username as string;
+    const password: string = req.body.password as string;
     try {
         if (!(await connectToGapps(page, username, password)))
             throw Error("wrong username or passsword");
