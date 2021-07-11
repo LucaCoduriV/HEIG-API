@@ -73,14 +73,18 @@ export default async (req: Request, res: Response) => {
                     const coef: any = row.children[row.children.length - 2].textContent;
                     const moyenne: any = row.children[row.children.length - 3].textContent;
                     const title: any = row.children[row.children.length - 4].textContent;
+                    const reg = /(?<=\().\d*/g;
+                    const regCoef = reg.exec(coef)[0];
+
                     console.log(type);
+                    let cvtCoef = parseFloat(regCoef);
                     let cvtGrade = parseFloat(grade);
                     let cvtMoyenne = parseFloat(moyenne);
                     notes[notes.length - 1][type].push({
                         moyenneClasse: !isNaN(cvtMoyenne) ? cvtMoyenne : 0.0,
                         titre: title,
                         note: !isNaN(cvtGrade) ? cvtGrade : 0.0,
-                        coef: coef, // TODO transformer en float
+                        coef: !isNaN(cvtCoef) ? cvtCoef : 0.0, // TODO transformer en float
                     });
             }
         });
@@ -95,6 +99,6 @@ export default async (req: Request, res: Response) => {
       else <td> contient les notes
       */
 
-    browser.close();
+    //browser.close();
     res.send(resultats);
 };
