@@ -99,6 +99,6 @@ export default async (req: Request, res: Response) => {
       else <td> contient les notes
       */
 
-    //browser.close();
+    browser.close();
     res.send(resultats);
 };
