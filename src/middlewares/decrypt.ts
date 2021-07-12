@@ -12,7 +12,6 @@ export default (req: Request, res: Response, next: Function) => {
     if (req.query?.decrypt == "true") {
         const encryptedPassword: string = req.body.password as string;
         req.body.password = RsaManager.getInstance().decrypt(encryptedPassword);
-        console.log(req.body.password);
         return next();
     }
 
