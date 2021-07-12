@@ -13,7 +13,7 @@ export default async (req: Request, res: Response) => {
     let trimestre: Trimestre = Trimestre.DEUX;
     let type: number = 2; // 2 pour horaire étudiant
 
-    let url: string = `https://gaps.heig-vd.ch/consultation/horaires/?annee=${annee}&trimestre=${trimestre}&type=${type}}`;
+    let url: string = `https://gaps.heig-vd.ch/consultation/horaires/?annee=${annee}&trimestre=${trimestre}&type=${type}`;
 
     const browser: Browser = await puppeteer.launch({
         headless: false,
@@ -24,7 +24,7 @@ export default async (req: Request, res: Response) => {
     const password: string = req.body.password as string;
 
     await connectToGapps(page, username, password);
-    await page.goto(url);
+    await page.goto(url, { waitUntil: "networkidle0" });
 
     await page.waitForSelector(".horaire");
 

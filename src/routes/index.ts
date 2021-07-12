@@ -13,6 +13,7 @@ router.post(
     "/notes",
     body("username").isLength({ min: 3 }),
     body("password").isLength({ min: 4 }),
+    decrypt,
     getNotes
 );
 
@@ -20,6 +21,7 @@ router.post(
     "/horaires",
     body("username").isLength({ min: 3 }),
     body("password").isLength({ min: 4 }),
+    decrypt,
     getHoraires
 );
 // il faut peut-être changer la méthode get pour post car dans l'historique les mot de passe seront affiché en claire.
@@ -31,7 +33,7 @@ router.post(
     login
 );
 
-router.get("/publickey", getPublicKey);
+router.get("/public_key", getPublicKey);
 router.get("/encryptdata", encryptData); // pour tester seulement
 
 export default router;
