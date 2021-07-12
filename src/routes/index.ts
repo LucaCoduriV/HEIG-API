@@ -24,7 +24,7 @@ router.post(
     decrypt,
     getHoraires
 );
-// il faut peut-être changer la méthode get pour post car dans l'historique les mot de passe seront affiché en claire.
+
 router.post(
     "/login",
     body("username").isLength({ min: 3 }),
