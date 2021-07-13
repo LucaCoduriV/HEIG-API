@@ -10,7 +10,9 @@ export default async (req: Request, res: Response) => {
         return res.status(StatusCodes.BAD_REQUEST).json({ errors: errors.array() });
     }
     const browser: Browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
+        executablePath: "/usr/bin/chromium-browser",
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
     const page: Page = await browser.newPage();
 

@@ -16,7 +16,9 @@ export default async (req: Request, res: Response) => {
     let url: string = `https://gaps.heig-vd.ch/consultation/horaires/?annee=${annee}&trimestre=${trimestre}&type=${type}`;
 
     const browser: Browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
+        executablePath: "/usr/bin/chromium-browser",
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
     const page: Page = await browser.newPage();
 

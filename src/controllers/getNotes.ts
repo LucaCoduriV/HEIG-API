@@ -14,7 +14,9 @@ export default async (req: Request, res: Response) => {
     // si ya déjà une session ouverte
     // COOKIE SET -> LA SESSION
     const browser: Browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
+        executablePath: "/usr/bin/chromium-browser",
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
     const page: Page = await browser.newPage();
 
