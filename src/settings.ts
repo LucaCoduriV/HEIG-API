@@ -4,5 +4,6 @@ export const browserOptions = () => {
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
     };
     if (process.env.CHROME_PATH) options["executablePath"] = `${process.env.CHROME_PATH}`;
+    console.log(options);
     return options;
 };
