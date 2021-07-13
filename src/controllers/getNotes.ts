@@ -86,13 +86,12 @@ export default async (req: Request, res: Response) => {
                         moyenneClasse: !isNaN(cvtMoyenne) ? cvtMoyenne : 0.0,
                         titre: title,
                         note: !isNaN(cvtGrade) ? cvtGrade : 0.0,
-                        coef: !isNaN(cvtCoef) ? cvtCoef : 0.0, // TODO transformer en float
+                        coef: !isNaN(cvtCoef) ? cvtCoef : 0.0,
                     });
             }
         });
         return notes;
     });
-    console.log(resultats);
     /*
       les vérification suivante doivent être fait dans le <table>[0]
   

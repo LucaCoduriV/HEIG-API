@@ -8,7 +8,6 @@ export default (req: Request, res: Response, next: Function) => {
     if (!errors.isEmpty()) {
         return res.status(StatusCodes.BAD_REQUEST).json({ errors: errors.array() });
     }
-    console.log(req.query.decrypt);
     if (req.query?.decrypt == "true") {
         const encryptedPassword: string = req.body.password as string;
         req.body.password = RsaManager.getInstance().decrypt(encryptedPassword);
