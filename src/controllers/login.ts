@@ -3,17 +3,15 @@ import { validationResult } from "express-validator";
 import { StatusCodes } from "http-status-codes";
 import puppeteer, { Browser, Page } from "puppeteer";
 import connectToGapps from "../utils/connectToGapps";
+import { browserOptions } from "../settings";
 
 export default async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(StatusCodes.BAD_REQUEST).json({ errors: errors.array() });
     }
-    const browser: Browser = await puppeteer.launch({
-        headless: true,
-        executablePath: "/usr/bin/chromium-browser",
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+
+    const browser: Browser = await puppeteer.launch(browserOptions());
     const page: Page = await browser.newPage();
 
     const username: string = req.body.username as string;

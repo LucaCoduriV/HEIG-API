@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import puppeteer, { Browser, Page } from "puppeteer";
+import { browserOptions } from "../settings";
 import connectToGapps from "../utils/connectToGapps";
 
 enum Trimestre {
@@ -15,11 +16,7 @@ export default async (req: Request, res: Response) => {
 
     let url: string = `https://gaps.heig-vd.ch/consultation/horaires/?annee=${annee}&trimestre=${trimestre}&type=${type}`;
 
-    const browser: Browser = await puppeteer.launch({
-        headless: true,
-        executablePath: "/usr/bin/chromium-browser",
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    const browser: Browser = await puppeteer.launch(browserOptions());
     const page: Page = await browser.newPage();
 
     const username: string = req.body.username as string;

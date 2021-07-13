@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { StatusCodes } from "http-status-codes";
 import puppeteer, { Browser, Page } from "puppeteer";
+import { browserOptions } from "../settings";
 import connectToGapps from "../utils/connectToGapps";
 
 export default async (req: Request, res: Response) => {
@@ -13,11 +14,7 @@ export default async (req: Request, res: Response) => {
     ///GET PARAMETERE USER, SELECT * FROM SESSION WHERE USER = REQ.USER
     // si ya déjà une session ouverte
     // COOKIE SET -> LA SESSION
-    const browser: Browser = await puppeteer.launch({
-        headless: true,
-        executablePath: "/usr/bin/chromium-browser",
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    const browser: Browser = await puppeteer.launch(browserOptions());
     const page: Page = await browser.newPage();
 
     const url: string = process.env.GAPS_GRADE_URL;
