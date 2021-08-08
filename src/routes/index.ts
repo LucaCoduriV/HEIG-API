@@ -13,6 +13,7 @@ router.post(
     "/notes",
     body("username").isLength({ min: 3 }),
     body("password").isLength({ min: 4 }),
+    body("gapsId").exists(),
     decrypt,
     getNotes
 );

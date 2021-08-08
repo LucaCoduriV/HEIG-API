@@ -4,25 +4,16 @@ import { StatusCodes } from "http-status-codes";
 import puppeteer, { Browser, Page } from "puppeteer";
 import connectToGapps from "../utils/connectToGapps";
 import { browserOptions } from "../settings";
+import Gaps from "../utils/gaps";
 
 export default async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(StatusCodes.BAD_REQUEST).json({ errors: errors.array() });
-    }
+    const gaps = new Gaps();
 
-    const browser: Browser = await puppeteer.launch(browserOptions());
-    const page: Page = await browser.newPage();
-
-    const username: string = req.body.username as string;
-    const password: string = req.body.password as string;
     try {
-        if (!(await connectToGapps(page, username, password)))
-            throw Error("wrong username or passsword");
+        return res
+            .status(StatusCodes.OK)
+            .send({ id: await gaps.set_credentials(req.body.username, req.body.password) });
     } catch (e) {
-        browser.close();
-        return res.status(StatusCodes.UNAUTHORIZED).send({ error: e.message });
+        return res.status(StatusCodes.UNAUTHORIZED).send({ id: -1 });
     }
-    browser.close();
-    return res.status(StatusCodes.OK).send();
 };

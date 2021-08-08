@@ -1,102 +1,20 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { StatusCodes } from "http-status-codes";
-import puppeteer, { Browser, Page } from "puppeteer";
-import { browserOptions } from "../settings";
-import connectToGapps from "../utils/connectToGapps";
+import Gaps from "../utils/gaps";
 
 export default async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(StatusCodes.BAD_REQUEST).json({ errors: errors.array() });
+    const gaps = new Gaps();
+    try {
+        const response = await gaps.get_notes(
+            req.body.username,
+            req.body.password,
+            req.body.gapsId,
+            2020
+        );
+        return res.status(StatusCodes.OK).send(response);
+    } catch (e) {
+        console.log(e);
+        return res.status(StatusCodes.UNAUTHORIZED).send({ gapsId: -1 });
     }
-
-    ///GET PARAMETERE USER, SELECT * FROM SESSION WHERE USER = REQ.USER
-    // si ya déjà une session ouverte
-    // COOKIE SET -> LA SESSION
-    const browser: Browser = await puppeteer.launch(browserOptions());
-    const page: Page = await browser.newPage();
-
-    const url: string = process.env.GAPS_GRADE_URL;
-    const drop_down_value: string = "https://aai-logon.hes-so.ch/idp/shibboleth";
-    const username: string = req.body.username as string;
-    const password: string = req.body.password as string;
-
-    await connectToGapps(page, username, password);
-    await page.goto(url, { waitUntil: "networkidle0" });
-    await page.waitForSelector(".displayArray");
-
-    // Se connecter avec nom d'utilisateur et mdp si cookie non valide
-    // sauvegarder le cookie dans une table MYSQL avec les info de l'user -> https://stackoverflow.com/questions/11252704/mysql-delete-records-older-than-x-minutes
-    // et supprimer X temps (il faut détérminer combien de temps dure la session gaps)
-    // utiliser le cookie pour les requêtes -> en verifiant si l'user à recemment exécuté une requête et que le cookie se trouve dans notre tableau
-    //   await page.evaluate(`(async () => {
-    //     var table = document.getElementsByClassName("displayArray");
-    //     console.log(table);
-    //   })()`);
-    //   const tr = await page.$eval(
-    //     "table.displayArray > tbody",
-    //     (el) => el.childNodes
-    //   );
-    const resultats = await page.$$eval(".displayArray tr", (rows) => {
-        let notes: Array<Branche> = [];
-        let nomBranche: string;
-        let type: "cours" | "laboratoire";
-        rows.forEach((row) => {
-            switch (row.childElementCount) {
-                case 1:
-                    nomBranche = row.firstElementChild.textContent;
-                    const splitted = nomBranche.split(" ");
-                    nomBranche = splitted[0];
-                    console.log(nomBranche);
-                    notes.push({
-                        nom: nomBranche,
-                        cours: [],
-                        laboratoire: [],
-                        moyenne: parseFloat(splitted[splitted.length - 1]),
-                    });
-                    break;
-                case 6:
-                    const text: any = row.firstElementChild.textContent;
-
-                    console.log(text);
-
-                    if (text.includes("Cours")) {
-                        type = "cours";
-                    } else {
-                        type = "laboratoire";
-                    }
-                    break;
-                default:
-                    const grade: any = row.children[row.children.length - 1].textContent;
-                    const coef: any = row.children[row.children.length - 2].textContent;
-                    const moyenne: any = row.children[row.children.length - 3].textContent;
-                    const title: any = row.children[row.children.length - 4].textContent;
-                    const reg = /(?<=\().\d*/g;
-                    const regCoef = reg.exec(coef)[0];
-
-                    console.log(type);
-                    let cvtCoef = parseFloat(regCoef);
-                    let cvtGrade = parseFloat(grade);
-                    let cvtMoyenne = parseFloat(moyenne);
-                    notes[notes.length - 1][type].push({
-                        moyenneClasse: !isNaN(cvtMoyenne) ? cvtMoyenne : 0.0,
-                        titre: title,
-                        note: !isNaN(cvtGrade) ? cvtGrade : 0.0,
-                        coef: !isNaN(cvtCoef) ? cvtCoef : 0.0,
-                    });
-            }
-        });
-        return notes;
-    });
-    /*
-      les vérification suivante doivent être fait dans le <table>[0]
-  
-      if count(<td>) == 1 --> titre branche
-      else if count(<td>) == 6 --> sous titre
-      else <td> contient les notes
-      */
-
-    browser.close();
-    res.send(resultats);
 };
