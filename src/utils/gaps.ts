@@ -61,7 +61,7 @@ export default class Gaps {
                 },
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-                    "User-Agent": "HEIG-Bot ('0.4.0')",
+                    "User-Agent": "HEIG-API ('0.4.0')",
                 },
             }
         );
