@@ -1,6 +1,7 @@
 import axios from "axios";
 import { parse, valid } from "node-html-parser";
 import qs from "qs";
+const icalToolkit = require("ical-toolkit");
 
 export default class Gaps {
     static URL_BASE = "https://gaps.heig-vd.ch/";
@@ -8,7 +9,6 @@ export default class Gaps {
         Gaps.URL_BASE + "/consultation/controlescontinus/consultation.php";
     static URL_ATTENDANCE = Gaps.URL_BASE + "/consultation/etudiant/";
     static URL_TIMETABLE = Gaps.URL_BASE + "/consultation/horaires/";
-
     static DIR_DB_GAPS = "/heig.gaps/";
     static DIR_DB_TIMETABLE = "/heig.gaps.timetable/";
 
@@ -61,7 +61,7 @@ export default class Gaps {
                 },
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-                    "User-Agent": "HEIG-Bot ('0.4.0')",
+                    "User-Agent": "HEIG-API ('0.4.0')",
                 },
             }
         );
@@ -117,5 +117,29 @@ export default class Gaps {
         });
 
         return notes;
+    }
+
+    async get_horaires(
+        username: string,
+        password: string,
+        year: number,
+        trimestre: number,
+        gapsId: number,
+        type: number
+    ): Promise<object> {
+        const url: string = `${Gaps.URL_TIMETABLE}?annee=${year}&trimestre=${trimestre}&type=${type}&id=${gapsId}&icalendarversion=2&individual=1`;
+
+        const response = await axios.get(url, {
+            auth: {
+                username: username,
+                password: password,
+            },
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                "User-Agent": "HEIG-API ('0.4.0')",
+            },
+        });
+
+        return icalToolkit.parseToJSON(response.data);
     }
 }
