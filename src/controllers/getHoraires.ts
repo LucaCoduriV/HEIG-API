@@ -16,14 +16,21 @@ export default async (req: Request, res: Response) => {
     let type: number = 2; // 2 pour horaire étudiant
     const gapsId = req.body.gapsId;
 
-
     const username: string = req.body.username as string;
     const password: string = req.body.password as string;
 
     const gaps = new Gaps();
-
-    const resultats = await gaps.get_horaires(username, password, annee, trimestre, gapsId);
-
-
-    res.send(resultats);
+    try {
+        const resultats = await gaps.get_horaires(
+            username,
+            password,
+            annee,
+            trimestre,
+            gapsId,
+            type
+        );
+        return res.send(resultats);
+    } catch (e) {
+        return res.status(500).send(e.message);
+    }
 };

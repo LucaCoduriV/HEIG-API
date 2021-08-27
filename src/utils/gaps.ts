@@ -1,32 +1,7 @@
 import axios from "axios";
 import { parse, valid } from "node-html-parser";
-import ical from "node-ical";
 import qs from "qs";
-
-enum JourSemaine {
-    LUNDI = 0,
-    MARDI,
-    MERCREDI,
-    JEUDI,
-    VENDREDI,
-}
-
-function getDayFromPos(position: number): JourSemaine {
-    switch (position) {
-        case 75:
-            return JourSemaine.LUNDI;
-        case 223:
-            return JourSemaine.MARDI;
-        case 371:
-            return JourSemaine.MERCREDI;
-        case 519:
-            return JourSemaine.JEUDI;
-        case 667:
-            return JourSemaine.VENDREDI;
-        default:
-            return JourSemaine.LUNDI;
-    }
-}
+const icalToolkit = require("ical-toolkit");
 
 export default class Gaps {
     static URL_BASE = "https://gaps.heig-vd.ch/";
@@ -34,7 +9,6 @@ export default class Gaps {
         Gaps.URL_BASE + "/consultation/controlescontinus/consultation.php";
     static URL_ATTENDANCE = Gaps.URL_BASE + "/consultation/etudiant/";
     static URL_TIMETABLE = Gaps.URL_BASE + "/consultation/horaires/";
-
     static DIR_DB_GAPS = "/heig.gaps/";
     static DIR_DB_TIMETABLE = "/heig.gaps.timetable/";
 
@@ -145,58 +119,27 @@ export default class Gaps {
         return notes;
     }
 
-    async get_horaires(username: string, password:string, year: number, trimestre:number, gapsId:number){
-        const type = 2;
-        const url2: string = `https://gaps.heig-vd.ch/consultation/horaires/?annee=${year}&trimestre=${trimestre}&type=${type}&id=${gapsId}&icalendarversion=2&individual=1`;
+    async get_horaires(
+        username: string,
+        password: string,
+        year: number,
+        trimestre: number,
+        gapsId: number,
+        type: number
+    ): Promise<object> {
+        const url: string = `${Gaps.URL_TIMETABLE}?annee=${year}&trimestre=${trimestre}&type=${type}&id=${gapsId}&icalendarversion=2&individual=1`;
 
-        // qs.stringify({
-        //     rs: "getStudentCCs",
-        //     rsargs: "[" + gapsId + "," + year + ",null]",
-        // }),
-        // {
-        //     auth: {
-        //         username: username,
-        //         password: password,
-        //     },
-        //     headers: {
-        //         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-        //         "User-Agent": "HEIG-API ('0.4.0')",
-        //     },
-        // }
-        let response;
-        try{
-            response = await axios.get(url2,{
-                auth:{
-                    username: username,
-                    password: password,
-                },
-                headers:{
-                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-                    "User-Agent": "HEIG-API ('0.4.0')",
-                }
-            });
-        }catch(e){
-            console.log(e);
-        }
-        console.log(response.data);
-        // let events
-        // try{
-        //     if(response){
-        //         events = ical.sync.parseICS(response.data);
-        //         if(events){
-        //             for (const event of Object.values(events)) {
-        //                 console.log(
-        //                     event
-        //                 );
-        //             };
-        //         }
-                
-        //     }
-        // }catch(e){
-        //     console.log(e);
-        // }
-        
-        return;   
+        const response = await axios.get(url, {
+            auth: {
+                username: username,
+                password: password,
+            },
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                "User-Agent": "HEIG-API ('0.4.0')",
+            },
+        });
 
+        return icalToolkit.parseToJSON(response.data);
     }
 }
