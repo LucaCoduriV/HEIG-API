@@ -1,6 +1,32 @@
 import axios from "axios";
 import { parse, valid } from "node-html-parser";
+import ical from "node-ical";
 import qs from "qs";
+
+enum JourSemaine {
+    LUNDI = 0,
+    MARDI,
+    MERCREDI,
+    JEUDI,
+    VENDREDI,
+}
+
+function getDayFromPos(position: number): JourSemaine {
+    switch (position) {
+        case 75:
+            return JourSemaine.LUNDI;
+        case 223:
+            return JourSemaine.MARDI;
+        case 371:
+            return JourSemaine.MERCREDI;
+        case 519:
+            return JourSemaine.JEUDI;
+        case 667:
+            return JourSemaine.VENDREDI;
+        default:
+            return JourSemaine.LUNDI;
+    }
+}
 
 export default class Gaps {
     static URL_BASE = "https://gaps.heig-vd.ch/";
@@ -117,5 +143,60 @@ export default class Gaps {
         });
 
         return notes;
+    }
+
+    async get_horaires(username: string, password:string, year: number, trimestre:number, gapsId:number){
+        const type = 2;
+        const url2: string = `https://gaps.heig-vd.ch/consultation/horaires/?annee=${year}&trimestre=${trimestre}&type=${type}&id=${gapsId}&icalendarversion=2&individual=1`;
+
+        // qs.stringify({
+        //     rs: "getStudentCCs",
+        //     rsargs: "[" + gapsId + "," + year + ",null]",
+        // }),
+        // {
+        //     auth: {
+        //         username: username,
+        //         password: password,
+        //     },
+        //     headers: {
+        //         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        //         "User-Agent": "HEIG-API ('0.4.0')",
+        //     },
+        // }
+        let response;
+        try{
+            response = await axios.get(url2,{
+                auth:{
+                    username: username,
+                    password: password,
+                },
+                headers:{
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                    "User-Agent": "HEIG-API ('0.4.0')",
+                }
+            });
+        }catch(e){
+            console.log(e);
+        }
+        console.log(response.data);
+        // let events
+        // try{
+        //     if(response){
+        //         events = ical.sync.parseICS(response.data);
+        //         if(events){
+        //             for (const event of Object.values(events)) {
+        //                 console.log(
+        //                     event
+        //                 );
+        //             };
+        //         }
+                
+        //     }
+        // }catch(e){
+        //     console.log(e);
+        // }
+        
+        return;   
+
     }
 }
