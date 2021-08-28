@@ -142,4 +142,49 @@ export default class Gaps {
 
         return icalToolkit.parseToJSON(response.data);
     }
+
+    async get_user_infos(username: string, password: string, gapsId: number): Promise<any> {
+        const response = await axios.post(
+            "https://gaps.heig-vd.ch/consultation/etudiant/",
+            qs.stringify({
+                rs: "smartReplacePart",
+                rsargs: `["STUDENT_SELECT_ID","studentDataDiv","0",null,null,${gapsId},null]`, // à la base à la place de 0 il y avait 4044582100183115052 je ne sais pas pourquoi
+            }),
+            {
+                auth: {
+                    username: username,
+                    password: password,
+                },
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                    "User-Agent": "HEIG-API ('0.4.0')",
+                },
+            }
+        );
+
+        const data = JSON.parse((response.data as string).substring(2));
+        const parsed = parse(data);
+        const img = parsed.querySelector("td#photo img");
+        const avatar = Gaps.URL_BASE + "consultation" + img?.attributes["src"].substring(2);
+
+        const infoStandardElements = parsed.querySelectorAll("td#infostandard td b");
+        const firstname = infoStandardElements[1].innerText;
+        const lastname = infoStandardElements[0].innerText;
+        const birthdate = infoStandardElements[2].innerText;
+        const address = infoStandardElements[3].innerText;
+        const city = infoStandardElements[4].innerText;
+        const phone = infoStandardElements[5].innerText;
+        const email = infoStandardElements[6].innerText;
+
+        return {
+            firstname,
+            lastname,
+            img: avatar,
+            birthdate,
+            address,
+            city,
+            phone,
+            email,
+        };
+    }
 }

@@ -6,10 +6,14 @@ export default async (req: Request, res: Response) => {
     const gaps = new Gaps();
 
     try {
-        return res
-            .status(StatusCodes.OK)
-            .send({ id: await gaps.set_credentials(req.body.username, req.body.password) });
+        const data = await gaps.get_user_infos(
+            req.body.username,
+            req.body.password,
+            req.body.gapsId
+        );
+        return res.status(StatusCodes.OK).send(data);
     } catch (e) {
+        console.log(e);
         return res.status(StatusCodes.UNAUTHORIZED).send({ id: -1 });
     }
 };
