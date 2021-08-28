@@ -1,8 +1,5 @@
 import { Request, Response } from "express";
-import puppeteer, { Browser, Page } from "puppeteer";
 import Gaps from "../utils/gaps";
-import { browserOptions } from "../settings";
-import connectToGapps from "../utils/connectToGapps";
 
 enum Trimestre {
     ETE = 1,
