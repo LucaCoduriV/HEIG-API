@@ -10,8 +10,10 @@ export default async (req: Request, res: Response) => {
             req.body.username,
             req.body.password,
             req.body.gapsId,
-            2020
+            req.body.year ?? 2020
         );
+        console.log(response?.length);
+        console.log(req.body.year);
         return res.status(StatusCodes.OK).send(response);
     } catch (e) {
         console.log(e);

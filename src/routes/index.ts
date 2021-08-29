@@ -15,6 +15,7 @@ router.post(
     body("username").isLength({ min: 3 }),
     body("password").isLength({ min: 4 }),
     body("gapsId").exists(),
+    body("year").isLength({ min: 4, max: 4 }),
     decrypt,
     getNotes
 );
