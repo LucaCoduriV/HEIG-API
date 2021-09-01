@@ -122,6 +122,7 @@ export default class Gaps {
                                 : title,
                         note: !isNaN(cvtGrade) ? cvtGrade : 0.0,
                         coef: !isNaN(cvtCoef) ? cvtCoef : 0.0,
+                        date: date,
                     });
             }
         });
