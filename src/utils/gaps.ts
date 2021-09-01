@@ -1,5 +1,6 @@
 import axios from "axios";
 import { parse, valid } from "node-html-parser";
+import { getChildNodes } from "parse5/lib/tree-adapters/default";
 import qs from "qs";
 const icalToolkit = require("ical-toolkit");
 
@@ -101,6 +102,12 @@ export default class Gaps {
                     const coef: any = row.childNodes[row.childNodes.length - 2].textContent;
                     const moyenne: any = row.childNodes[row.childNodes.length - 3].textContent;
                     const title: any = row.childNodes[row.childNodes.length - 4].textContent;
+
+                    const titleSelector = row.querySelector(
+                        "td:nth-child(2) > .formulaire_contenu_label > div"
+                    );
+
+                    const date: any = row.childNodes[1].textContent;
                     const reg = /(?<=\().\d*/g;
                     const regCoef = reg.exec(coef)[0];
 
@@ -109,7 +116,10 @@ export default class Gaps {
                     let cvtMoyenne = parseFloat(moyenne);
                     notes[notes.length - 1][type].push({
                         moyenneClasse: !isNaN(cvtMoyenne) ? cvtMoyenne : 0.0,
-                        titre: title,
+                        titre:
+                            titleSelector != null
+                                ? titleSelector.querySelector("div:nth-child(2)").innerText
+                                : title,
                         note: !isNaN(cvtGrade) ? cvtGrade : 0.0,
                         coef: !isNaN(cvtCoef) ? cvtCoef : 0.0,
                     });
