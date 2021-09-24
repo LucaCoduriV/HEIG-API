@@ -24,6 +24,7 @@ router.post(
     "/horaires",
     body("username").isLength({ min: 3 }),
     body("password").isLength({ min: 4 }),
+    body("gapsId").isLength({ min: 1 }),
     decrypt,
     getHoraires
 );
