@@ -4,7 +4,7 @@ import { getChildNodes } from "parse5/lib/tree-adapters/default";
 import qs from "qs";
 const icalToolkit = require("ical-toolkit");
 
-export default class Gaps {
+class Gaps {
     static URL_BASE = "https://gaps.heig-vd.ch/";
     static URL_CONSULTATION_NOTES =
         Gaps.URL_BASE + "/consultation/controlescontinus/consultation.php";
@@ -199,3 +199,5 @@ export default class Gaps {
         };
     }
 }
+
+export default new Gaps()

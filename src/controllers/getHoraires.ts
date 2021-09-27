@@ -16,9 +16,8 @@ export default async (req: Request, res: Response) => {
     const username: string = req.body.username as string;
     const password: string = req.body.password as string;
 
-    const gaps = new Gaps();
     try {
-        const resultats = await gaps.get_horaires(
+        const resultats = await Gaps.get_horaires(
             username,
             password,
             annee,

@@ -3,10 +3,8 @@ import { StatusCodes } from "http-status-codes";
 import Gaps from "../utils/gaps";
 
 export default async (req: Request, res: Response) => {
-    const gaps = new Gaps();
-
     try {
-        const data = await gaps.get_user_infos(
+        const data = await Gaps.get_user_infos(
             req.body.username,
             req.body.password,
             req.body.gapsId
