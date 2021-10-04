@@ -27,6 +27,11 @@ export default async (req: Request, res: Response) => {
     const xlsxLink = attrs.substring(hrefPos + hrefTagString.length, quotePos);
     console.log(xlsxLink);
 
+    if (!xlsxLink)
+      return res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send('Excel file not found on the Intranet page.');
+
     // Get XLSX data
     const { body: csvBuffer } = await intranet.authenticatedCallNTLM({
       url: xlsxLink,
@@ -84,7 +89,6 @@ export default async (req: Request, res: Response) => {
 
     return res.status(StatusCodes.OK).send(menus);
   } catch (e) {
-    console.log(e);
-    return res.status(StatusCodes.UNAUTHORIZED).send(e);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(e.message);
   }
 };
