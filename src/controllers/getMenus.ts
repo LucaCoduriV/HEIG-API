@@ -56,7 +56,7 @@ export default async (req: Request, res: Response) => {
         };
       });
 
-    const delimiters = ['Crème de', 'Soupe', 'Potage'];
+    const delimiters = ['Crème de', 'Soupe', 'Potage', 'Bouillon', 'Velouté'];
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
     const menus: Menus = {};
     let dayId = -1;
