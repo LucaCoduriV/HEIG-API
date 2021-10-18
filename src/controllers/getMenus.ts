@@ -56,7 +56,14 @@ export default async (req: Request, res: Response) => {
         };
       });
 
-    const delimiters = ['Crème de', 'Soupe', 'Potage', 'Bouillon', 'Velouté'];
+    const delimiters = [
+      'Crème de',
+      'Soupe',
+      'Potage',
+      'Bouillon',
+      'Velouté',
+      'Consommé',
+    ];
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
     const menus: Menus = {};
     let dayId = -1;
