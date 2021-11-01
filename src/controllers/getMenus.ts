@@ -47,7 +47,7 @@ export default async (req: Request, res: Response) => {
     // console.log(xlsx.utils.sheet_to_json(ws));
     const rows = xlsx.utils
       .sheet_to_json(ws)
-      .splice(2) // Remove title lines
+      .splice(3) // Remove title lines
       .slice(0, -1) // Remove last line: schedules
       .map((row: XLSXRow) => {
         return {
@@ -57,7 +57,7 @@ export default async (req: Request, res: Response) => {
       });
 
     const delimiters = [
-      'Crème de',
+      'Crème',
       'Soupe',
       'Potage',
       'Bouillon',
@@ -96,6 +96,7 @@ export default async (req: Request, res: Response) => {
 
     return res.status(StatusCodes.OK).send(menus);
   } catch (e) {
+    console.log(e);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(e.message);
   }
 };
