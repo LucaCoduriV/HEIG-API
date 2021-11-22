@@ -44,10 +44,9 @@ export default async (req: Request, res: Response) => {
     const wsname = wb.SheetNames[0];
     const ws = wb.Sheets[wsname];
 
-    // console.log(xlsx.utils.sheet_to_json(ws));
     const rows = xlsx.utils
-      .sheet_to_json(ws)
-      .splice(3) // Remove title lines
+      .sheet_to_json(ws, { blankrows: true })
+      .splice(8) // Remove title lines
       .slice(0, -1) // Remove last line: schedules
       .map((row: XLSXRow) => {
         return {
@@ -56,42 +55,18 @@ export default async (req: Request, res: Response) => {
         };
       });
 
-    const delimiters = [
-      'Crème',
-      'Soupe',
-      'Potage',
-      'Bouillon',
-      'Velouté',
-      'Consommé',
-    ];
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
     const menus: Menus = {};
-    let dayId = -1;
+    let index = 0;
 
-    for (const row of rows) {
-      let day = menus[days[dayId]];
-      // New day
-      let newDay = false;
-      for (const delimiter of delimiters) {
-        if (row.tradition.includes(delimiter)) {
-          newDay = true;
-          break;
-        }
+    for (const day of days) {
+      console.log(day);
+      menus[day] = { tradition: [], vegetarien: [] };
+      for (let i = index; i < index + 6; i++) {
+        if (rows[i].tradition) menus[day].tradition.push(rows[i].tradition);
+        if (rows[i].vegetarien) menus[day].vegetarien.push(rows[i].vegetarien);
       }
-
-      if (newDay) {
-        day = menus[days[++dayId]] = {
-          tradition: [],
-          vegetarien: [],
-        };
-      }
-
-      if (row.tradition) {
-        day.tradition.push(row.tradition);
-      }
-      if (row.vegetarien) {
-        day.vegetarien.push(row.vegetarien);
-      }
+      index += 7;
     }
 
     return res.status(StatusCodes.OK).send(menus);
