@@ -1,10 +1,10 @@
-import { Request, Response } from "express";
-import Gaps from "../utils/gaps";
+import { Request, Response } from 'express';
+import Gaps from '../utils/gaps';
 
 enum Trimestre {
-    ETE = 1,
-    UN,
-    DEUX,
+  ETE = 1,
+  UN,
+  DEUX,
 }
 
 export default async (req: Request, res: Response) => {
@@ -12,21 +12,20 @@ export default async (req: Request, res: Response) => {
     let trimestre: Trimestre = 3;
     let type: number = 2; // 2 pour horaire étudiant
     const gapsId = req.body.gapsId;
+  const username: string = req.body.username as string;
+  const password: string = req.body.password as string;
 
-    const username: string = req.body.username as string;
-    const password: string = req.body.password as string;
-
-    try {
-        const resultats = await Gaps.get_horaires(
-            username,
-            password,
-            annee,
-            trimestre,
-            gapsId,
-            type
-        );
-        return res.send(resultats);
-    } catch (e) {
-        return res.status(500).send(e.message);
-    }
+  try {
+    const resultats = await Gaps.get_horaires(
+      username,
+      password,
+      annee,
+      trimestre,
+      gapsId,
+      type,
+    );
+    return res.send(resultats);
+  } catch (e) {
+    return res.status(500).send(e.message);
+  }
 };
