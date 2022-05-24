@@ -48,6 +48,8 @@ export default async (req: Request, res: Response) => {
     );
     console.log(result.data.days);
 
+    if (result.status == 204) throw new Error('No content');
+
     const menudays = result.data.days as {
       day: Date;
       menus: {
