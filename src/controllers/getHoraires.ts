@@ -16,7 +16,7 @@ export default async (req: Request, res: Response) => {
   const password: string = req.body.password as string;
 
   try {
-    let resultats = await Gaps.get_horaires(
+    let resultats: any = await Gaps.get_horaires(
       username,
       password,
       annee,
@@ -25,9 +25,11 @@ export default async (req: Request, res: Response) => {
       type,
     );
 
-    resultats = (resultats as Array<any>).filter(
+    const data = (resultats['VEVENT'] as Array<any>).filter(
       (r) => r['DTSTART;TZID=Europe/Zurich'] != null,
     );
+
+    resultats['VEVENT'] = data;
 
     return res.send(resultats);
   } catch (e) {
