@@ -19,5 +19,5 @@ app.use(morgan(NODE_ENV == 'development' ? 'dev' : 'combined'));
 app.use(router);
 
 app.listen(PORT, () => {
-  console.log(`HEIG GAPS API started at http://localhost:${PORT}`);
+  console.log(`HEIG API started at http://localhost:${PORT}`);
 });
