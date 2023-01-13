@@ -3,6 +3,8 @@ import { parse, valid } from 'node-html-parser';
 import { getChildNodes } from 'parse5/lib/tree-adapters/default';
 import qs from 'qs';
 const icalToolkit = require('ical-toolkit');
+const moment = require('moment');
+import fs from 'fs';
 
 class Gaps {
   static URL_BASE = 'https://gaps.heig-vd.ch/';
@@ -132,6 +134,81 @@ class Gaps {
     });
 
     return notes;
+  }
+
+  async get_free_rooms() {
+    const theDay = moment();
+
+    const testFolder = './ressources/icals/';
+
+    async function readFiles(): Promise<string[]> {
+      return new Promise((res, rej) => {
+        fs.readdir(testFolder, (err: any, files: string[]) => {
+          if (err) rej(err);
+          res(files);
+        });
+      });
+    }
+
+    const files = await readFiles();
+
+    const eventByClass: any = {};
+
+    files.forEach((file) => {
+      icalToolkit
+        .parseFileToJSONSync(`./ressources/icals/${file}`)
+        .VEVENT.filter(
+          (value: any) => value['DTEND;TZID=Europe/Zurich'] != undefined,
+        )
+        .forEach((value: any) => {
+          (value.LOCATION as string).split(', ').forEach((location) => {
+            if (eventByClass[location] == undefined) {
+              eventByClass[location] = new Array();
+            }
+            let startDate = moment(value['DTSTART;TZID=Europe/Zurich']);
+            let endDate = moment(value['DTEND;TZID=Europe/Zurich']);
+
+            let object = {
+              start: startDate,
+              end: endDate,
+              day: startDate.isoWeekday(),
+              startTime: startDate.format('HH:mm'),
+              endTime: endDate.format('HH:mm'),
+            };
+
+            (eventByClass[location] as Array<any>).push(object);
+          });
+        });
+    });
+
+    let result = new Array();
+    for (let room in eventByClass) {
+      let overlaps = false;
+
+      let sameday = eventByClass[room]
+        .filter((event: any) => {
+          return event.day == theDay.isoWeekday();
+        })
+        .filter((event: any) => {
+          let cloneStart = theDay
+            .clone()
+            .set('hour', event.startTime.split(':')[0])
+            .set('minute', event.startTime.split(':')[1])
+            .set('second', 0);
+          let cloneEnd = theDay
+            .clone()
+            .set('hour', event.endTime.split(':')[0])
+            .set('minute', event.endTime.split(':')[1])
+            .set('second', 0);
+          return theDay.isBetween(cloneStart, cloneEnd);
+        });
+
+      if (sameday.length == 0) {
+        result.push(room);
+      }
+    }
+
+    return result;
   }
 
   async get_horaires(
