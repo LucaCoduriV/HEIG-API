@@ -9,7 +9,7 @@ enum Trimestre {
 
 export default async (req: Request, res: Response) => {
   let annee: number = 2022;
-  let trimestre: Trimestre = 1;
+  let trimestre: Trimestre = 3;
   let type: number = 2; // 2 pour horaire étudiant
   const gapsId = req.body.gapsId;
   const username: string = req.body.username as string;
