@@ -11,4 +11,4 @@ Il est important de souligner que j'utilise un serveur HTTP et non HTTPS.
 Cependant, pour un minimum de sécurité, le mot de passe n'est pas envoyé en clair sur le réseau.
 Evidemment, cela n'empêche pas les attaques par replay mais permet de garder les mots de passe secret.
 
-# A UTILISER AVEC PRÉCAUTION ! 🛑
+# A UTILISER AVEC PRÉCAUTION ! 🛑 
