@@ -15,6 +15,16 @@ class Gaps {
   static DIR_DB_GAPS = '/heig.gaps/';
   static DIR_DB_TIMETABLE = '/heig.gaps.timetable/';
 
+  // Retry a transient outbound call once, so a single network blip doesn't fail
+  // the whole request. Every remote GAPS call should go through this.
+  static async withRetry<T>(fn: () => Promise<T>): Promise<T> {
+    try {
+      return await fn();
+    } catch {
+      return await fn();
+    }
+  }
+
   async set_credentials(username: string, password: string): Promise<number> {
     const htmlString = 'DEFAULT_STUDENT_ID = ';
 
@@ -22,13 +32,15 @@ class Gaps {
       'User-Agent': 'Gaps Mobile App v1.0',
     };
 
-    const response = await axios.get(Gaps.URL_ATTENDANCE, {
-      headers: header,
-      auth: {
-        username: username,
-        password: password,
-      },
-    });
+    const response = await Gaps.withRetry(() =>
+      axios.get(Gaps.URL_ATTENDANCE, {
+        headers: header,
+        auth: {
+          username: username,
+          password: password,
+        },
+      }),
+    );
 
     const data: string = response.data;
 
@@ -221,16 +233,18 @@ class Gaps {
   ): Promise<object> {
     const url: string = `${Gaps.URL_TIMETABLE}?annee=${year}&trimestre=${trimestre}&type=${type}&id=${gapsId}&icalendarversion=2&individual=1`;
 
-    const response = await axios.get(url, {
-      auth: {
-        username: username,
-        password: password,
-      },
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-        'User-Agent': "HEIG-API ('0.4.0')",
-      },
-    });
+    const response = await Gaps.withRetry(() =>
+      axios.get(url, {
+        auth: {
+          username: username,
+          password: password,
+        },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+          'User-Agent': "HEIG-API ('0.4.0')",
+        },
+      }),
+    );
 
     return icalToolkit.parseToJSON(response.data);
   }
@@ -240,7 +254,7 @@ class Gaps {
     password: string,
     gapsId: number,
   ): Promise<any> {
-    const response = await axios.post(
+    const response = await Gaps.withRetry(() => axios.post(
       'https://gaps.heig-vd.ch/consultation/etudiant/',
       qs.stringify({
         rs: 'smartReplacePart',
@@ -256,7 +270,7 @@ class Gaps {
           'User-Agent': "HEIG-API ('0.4.0')",
         },
       },
-    );
+    ));
 
     const data = JSON.parse((response.data as string).substring(2));
     const parsed = parse(data);
